@@ -4,7 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sempro Cepat — IPII</title>
+    <meta name="description" content="Panduan langkah-demi-langkah interaktif untuk mahasiswa IPII dalam menyelesaikan Seminar Proposal (Sempro) mulai dari persiapan hingga pasca-seminar.">
+
+    <!-- Facebook / Open Graph Meta Tags -->
+    <meta property="og:url" content="https://sempro-cepat-ipii.vercel.app/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Sempro Cepat — IPII">
+    <meta property="og:description" content="Panduan langkah-demi-langkah interaktif untuk mahasiswa IPII dalam menyelesaikan Seminar Proposal (Sempro) mulai dari persiapan hingga pasca-seminar.">
+    <meta property="og:image" content="https://sempro-cepat-ipii.vercel.app/preview-image.png">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="sempro-cepat-ipii.vercel.app">
+    <meta property="twitter:url" content="https://sempro-cepat-ipii.vercel.app/">
+    <meta name="twitter:title" content="Sempro Cepat — IPII">
+    <meta name="twitter:description" content="Panduan langkah-demi-langkah interaktif untuk mahasiswa IPII dalam menyelesaikan Seminar Proposal (Sempro) mulai dari persiapan hingga pasca-seminar.">
+    <meta name="twitter:image" content="https://sempro-cepat-ipii.vercel.app/preview-image.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         /* ─── TOKENS ─────────────────────────────── */
         :root {
@@ -162,8 +180,17 @@
             padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 700;
             color: var(--text); box-shadow: var(--shadow);
             display: flex; align-items: center; gap: 8px;
-            transition: transform 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.3s;
-            cursor: default;
+            transition: transform 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.3s, opacity 0.3s;
+        }
+        .task-progress-pill.auto-hidden {
+            transform: translateY(-100px);
+            opacity: 0;
+            pointer-events: none;
+        }
+        .task-progress-pill.scroll-hidden {
+            transform: translateY(-100px);
+            opacity: 0;
+            pointer-events: none;
         }
         .task-progress-pill:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
         .task-progress-pill svg { width: 18px; height: 18px; stroke: var(--mint); transition: stroke 0.3s; }
@@ -321,6 +348,17 @@
         }
         .checklist li:hover { opacity: 0.85; }
         .checklist li:active { transform: scale(0.98); }
+
+        /* Animasi coret untuk teks tugas yang selesai */
+        .checklist li > span,
+        .checklist li > div:not(.check-icon) {
+            transition: all 0.3s ease;
+        }
+        .checklist li.is-checked > span,
+        .checklist li.is-checked > div:not(.check-icon) {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
 
         .check-icon {
             flex-shrink: 0;
@@ -1194,13 +1232,36 @@
             el.addEventListener('click', playUiSound);
         });
 
-        // --- FITUR 3: SCROLL PROGRESS ---
         const scrollBar = document.getElementById('scrollBar');
+        const taskPillElement = document.getElementById('taskProgressPill');
+        let lastScrollTop = 0;
+        let pillTimeout; // Variabel penyimpan timer 4 detik
+
+        function showPillTemporarily() {
+            if (!taskPillElement) return;
+            taskPillElement.classList.remove('auto-hidden');
+            taskPillElement.classList.remove('scroll-hidden'); // Cegah konflik dengan scroll
+            clearTimeout(pillTimeout); // Reset timer jika tombol diklik cepat
+            pillTimeout = setTimeout(() => {
+                taskPillElement.classList.add('auto-hidden');
+            }, 4000);
+        }
+
         window.addEventListener('scroll', () => {
             const scrollTop = window.scrollY || document.documentElement.scrollTop;
             const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
             const progress = (scrollTop / scrollHeight) * 100;
             if (scrollBar) scrollBar.style.width = progress + '%';
+
+            // Sembunyikan progress pill saat scroll ke bawah
+            if (taskPillElement) {
+                if (scrollTop > lastScrollTop && scrollTop > 50) {
+                    taskPillElement.classList.add('scroll-hidden');
+                } else {
+                    taskPillElement.classList.remove('scroll-hidden');
+                }
+            }
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
         });
 
         // --- FITUR 1: INTERACTIVE CHECKLIST & TASK PROGRESS ---
@@ -1223,6 +1284,18 @@
             return { checked, total, percentage };
         }
 
+        // Fungsi penembak hujan confetti dengan warna tema pastel
+        function fireConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#C084FC', '#FFA94D']
+                });
+            }
+        }
+
         checkItems.forEach((li, index) => {
             const iconDiv = li.querySelector('.check-icon');
             
@@ -1237,6 +1310,7 @@
 
             li.addEventListener('click', () => {
                 playUiSound(); // Mainkan efek suara
+                showPillTemporarily(); // Tampilkan pill dan mulai ulang timer 4 detik
                 const isNowChecked = !li.classList.contains('is-checked');
                 
                 if (isNowChecked) {
@@ -1250,10 +1324,16 @@
                 }
                 
                 localStorage.setItem('sempro-checks', JSON.stringify(savedChecks));
-                updateTaskProgress();
+                const progress = updateTaskProgress();
+                
+                // Cek jika tugas baru saja dicentang dan progress mencapai 100%
+                if (isNowChecked && progress.percentage === 100) {
+                    fireConfetti();
+                }
             });
         });
         updateTaskProgress(); // Inisialisasi awal UI
+        showPillTemporarily(); // Panggil saat web pertama kali dimuat
 
         // --- FITUR 5: SHARE BUTTON ---
         const btnShare = document.getElementById('btnShare');
