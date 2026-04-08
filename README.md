@@ -16,7 +16,7 @@ Proyek ini dibuat dengan HTML, CSS, dan JavaScript murni (vanilla) tanpa menggun
 ## Live
 
 Anda bisa mengakses versi live dari proyek ini di:
-**https://username.github.io/sempro-cepat/**
+**https://sempro-cepat-ipii.vercel.app/**
 
 ## Teknologi yang Digunakan
 
