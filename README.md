@@ -4,6 +4,11 @@ Ini adalah sebuah halaman web statis interaktif yang berfungsi sebagai panduan l
 
 Proyek ini dibuat dengan HTML, CSS, dan JavaScript murni (vanilla) tanpa menggunakan framework atau library eksternal.
 
+## Preview
+
+![Light Mode Preview](light-mode.webp)
+![Dark Mode Preview](dark-mode.webp)
+
 ## Fitur Utama
 
 - **Timeline Interaktif:** 8 tahap yang jelas dari persiapan hingga pasca-seminar.
