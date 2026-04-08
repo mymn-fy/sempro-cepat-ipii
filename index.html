@@ -146,6 +146,32 @@
         transform: rotate(90deg);
         }
 
+        /* ─── SCROLL & TASK PROGRESS ────────────── */
+        #scroll-progress-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 4px;
+            background: transparent; z-index: 1000;
+        }
+        #scrollBar {
+            height: 100%; width: 0%; background: var(--sky);
+            transition: width 0.1s ease-out;
+            border-radius: 0 4px 4px 0;
+        }
+        .task-progress-pill {
+            position: fixed; top: 24px; right: 24px; z-index: 998;
+            background: var(--surface); border: 2px solid var(--border);
+            padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 700;
+            color: var(--text); box-shadow: var(--shadow);
+            display: flex; align-items: center; gap: 8px;
+            transition: transform 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.3s;
+            cursor: default;
+        }
+        .task-progress-pill:hover { box-shadow: var(--shadow-hover); transform: translateY(-2px); }
+        .task-progress-pill svg { width: 18px; height: 18px; stroke: var(--mint); transition: stroke 0.3s; }
+        @media (max-width: 768px) {
+            .task-progress-pill { top: 16px; right: 16px; font-size: 11px; padding: 6px 12px; }
+            .task-progress-pill svg { width: 15px; height: 15px; }
+        }
+
         /* ─── LAYOUT ─────────────────────────────── */
         .container {
             max-width: 740px;
@@ -289,7 +315,12 @@
             align-items: flex-start;
             gap: 12px;
             font-size: 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: opacity 0.2s, transform 0.2s;
         }
+        .checklist li:hover { opacity: 0.85; }
+        .checklist li:active { transform: scale(0.98); }
 
         .check-icon {
             flex-shrink: 0;
@@ -297,9 +328,13 @@
             border-radius: 6px;
             display: flex; align-items: center; justify-content: center;
             margin-top: 2px;
+            transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+            border: 2px solid transparent;
         }
+        .check-icon.unchecked { background: transparent !important; border-color: var(--muted); }
+        .check-icon.unchecked svg { transform: scale(0); opacity: 0; }
 
-        .check-icon svg { width: 11px; height: 11px; stroke: white; stroke-width: 3; }
+        .check-icon svg { width: 11px; height: 11px; stroke: white; stroke-width: 3; transition: all 0.3s cubic-bezier(.34,1.56,.64,1); transform: scale(1); opacity: 1; }
 
         /* Info Block */
         .info-block {
@@ -601,6 +636,17 @@
 </head>
 <body>
 
+    <!-- Scroll Progress -->
+    <div id="scroll-progress-container"><div id="scrollBar"></div></div>
+
+    <!-- Task Progress Pill -->
+    <div class="task-progress-pill" id="taskProgressPill" title="Progress Tugasmu">
+        <svg id="taskPillIcon" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span id="taskPillText">0% Selesai</span>
+    </div>
+
     <!-- Floating Action Button (Settings) -->
     <div class="fab-wrapper" id="fabWrapper">
         <!-- Sub-menu -->
@@ -619,6 +665,12 @@
                 <!-- Pause icon -->
                 <svg id="icon-pause" viewBox="0 0 24 24" fill="none" stroke="var(--lavender)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
                     <rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+            </button>
+            <button class="theme-btn" id="btnShare" aria-label="Bagikan" title="Bagikan ke Teman">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--peach)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                 </svg>
             </button>
             <button class="theme-btn" id="themeToggle" aria-label="Toggle dark mode" title="Ganti tema">
@@ -1141,6 +1193,99 @@
             el.addEventListener('mouseenter', playUiSound);
             el.addEventListener('click', playUiSound);
         });
+
+        // --- FITUR 3: SCROLL PROGRESS ---
+        const scrollBar = document.getElementById('scrollBar');
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            if (scrollBar) scrollBar.style.width = progress + '%';
+        });
+
+        // --- FITUR 1: INTERACTIVE CHECKLIST & TASK PROGRESS ---
+        const checkItems = document.querySelectorAll('.checklist li');
+        const taskPillText = document.getElementById('taskPillText');
+        const taskPillIcon = document.getElementById('taskPillIcon');
+        let savedChecks = JSON.parse(localStorage.getItem('sempro-checks')) || [];
+
+        function updateTaskProgress() {
+            const total = checkItems.length;
+            const checked = document.querySelectorAll('.checklist li.is-checked').length;
+            const percentage = total > 0 ? Math.round((checked / total) * 100) : 0;
+            
+            if (taskPillText) {
+                taskPillText.textContent = `${percentage}% Selesai`;
+            }
+            if (taskPillIcon) {
+                taskPillIcon.style.stroke = percentage === 100 ? "var(--yellow)" : "var(--mint)";
+            }
+            return { checked, total, percentage };
+        }
+
+        checkItems.forEach((li, index) => {
+            const iconDiv = li.querySelector('.check-icon');
+            
+            // Tampilkan state berdasarkan localStorage
+            if (savedChecks.includes(index)) {
+                li.classList.add('is-checked');
+                iconDiv.classList.remove('unchecked');
+            } else {
+                li.classList.remove('is-checked');
+                iconDiv.classList.add('unchecked');
+            }
+
+            li.addEventListener('click', () => {
+                playUiSound(); // Mainkan efek suara
+                const isNowChecked = !li.classList.contains('is-checked');
+                
+                if (isNowChecked) {
+                    li.classList.add('is-checked');
+                    iconDiv.classList.remove('unchecked');
+                    if (!savedChecks.includes(index)) savedChecks.push(index);
+                } else {
+                    li.classList.remove('is-checked');
+                    iconDiv.classList.add('unchecked');
+                    savedChecks = savedChecks.filter(i => i !== index);
+                }
+                
+                localStorage.setItem('sempro-checks', JSON.stringify(savedChecks));
+                updateTaskProgress();
+            });
+        });
+        updateTaskProgress(); // Inisialisasi awal UI
+
+        // --- FITUR 5: SHARE BUTTON ---
+        const btnShare = document.getElementById('btnShare');
+        if (btnShare) {
+            btnShare.addEventListener('click', async () => {
+                const progress = updateTaskProgress();
+                let text = "";
+                
+                if (progress.checked === 0) {
+                    text = `Halo! aku baru mau mulai persiapan Sempro nih, kamu sampai mana? Cek panduannya di sini: ${window.location.href}`;
+                } else if (progress.checked === progress.total) {
+                    text = `Halo! Alhamdulillah aku sudah menyelesaikan SEMUA tahap persiapan Sempro (100%)! 🎉 Kamu sampai mana? Cek panduannya di sini: ${window.location.href}`;
+                } else {
+                    text = `Halo! aku sudah sampai tahap ${progress.percentage}% (${progress.checked}/${progress.total} tugas) di persiapan Sempro, kamu sampai mana? Cek panduannya di sini: ${window.location.href}`;
+                }
+                
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: 'Panduan Sempro Cepat - IPII',
+                            text: text
+                        });
+                    } catch (err) {
+                        console.log('Share canceled/failed', err);
+                    }
+                } else {
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert("Pesan dan tautan berhasil disalin! Silakan paste (tempel) di chat WhatsApp.");
+                    });
+                }
+            });
+        }
     </script>
 </body>
 </html>
