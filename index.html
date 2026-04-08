@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sempro Cepat — IPII</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* ─── TOKENS ─────────────────────────────── */
+        :root {
+            --bg:        #FFFBF5;
+            --surface:   #FFFFFF;
+            --text:      #1C1917;
+            --muted:     #78716C;
+            --border:    #E7E2DA;
+
+            --coral:     #FF6B6B;
+            --yellow:    #FFD93D;
+            --mint:      #6BCB77;
+            --sky:       #4D96FF;
+            --lavender:  #C084FC;
+            --peach:     #FFA94D;
+
+            --step1:     var(--coral);
+            --step2:     var(--sky);
+            --step3:     var(--mint);
+            --step4:     var(--yellow);
+            --step5:     var(--peach);
+            --step6:     var(--lavender);
+            --step7:     var(--coral);
+            --step8:     var(--sky);
+            --stepF:     var(--mint);
+            --fab-icon:  #F4D160; /* Kuning Pastel */
+
+            --radius:    16px;
+            --radius-sm: 10px;
+            --shadow:    0 4px 24px rgba(0,0,0,.07);
+            --shadow-hover: 0 8px 32px rgba(0,0,0,.12);
+        }
+
+        [data-theme="dark"] {
+            --bg:        #141218;
+            --surface:   #1E1B24;
+            --text:      #F5F0EB;
+            --muted:     #9C8FA6;
+            --border:    #2D2936;
+
+            --coral:     #FF8585;
+            --yellow:    #FFE066;
+            --mint:      #7EDB8A;
+            --sky:       #6DAEFF;
+            --lavender:  #D09EFF;
+            --peach:     #FFB86B;
+            --fab-icon:  #FFFFFF; /* Putih */
+        }
+
+        /* ─── RESET ──────────────────────────────── */
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            line-height: 1.7;
+            transition: background .3s, color .3s;
+            overflow-x: hidden;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        /* ─── NOISE TEXTURE ──────────────────────── */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 0;
+        }
+
+    /* ─── FLOATING ACTION BUTTON (FAB) ───────── */
+    .fab-wrapper {
+            position: fixed;
+            bottom: 28px; right: 28px;
+            z-index: 999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: opacity 0.4s, transform 0.4s, visibility 0.4s;
+    }
+
+    .fab-wrapper.hidden {
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(15px);
+    }
+
+    .fab-menu {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px) scale(0.8);
+        transition: all 0.3s cubic-bezier(.34,1.56,.64,1);
+        transform-origin: bottom center;
+        position: absolute;
+        bottom: 60px;
+    }
+
+    .fab-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+        }
+
+        .theme-btn {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            background: var(--surface);
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,.15);
+            transition: transform .3s cubic-bezier(.34,1.56,.64,1), background .3s, border-color .3s, box-shadow .3s;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.12) rotate(15deg);
+            box-shadow: 0 6px 28px rgba(0,0,0,.2);
+        }
+
+        .theme-btn svg {
+            width: 20px; height: 20px;
+        transition: transform .3s, opacity .2s;
+    }
+
+    .fab-main {
+        color: var(--fab-icon);
+    }
+
+    .fab-main.active svg {
+        transform: rotate(90deg);
+        }
+
+        /* ─── LAYOUT ─────────────────────────────── */
+        .container {
+            max-width: 740px;
+            margin: 0 auto;
+            padding: 80px 20px 60px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ─── HEADER ─────────────────────────────── */
+        header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: var(--yellow);
+            color: #1C1917;
+            padding: 6px 14px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .header-badge svg { width: 13px; height: 13px; stroke: #1C1917; }
+
+        h1 {
+            font-size: clamp(2.4rem, 6vw, 3.6rem);
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1.5px;
+        }
+
+        h1 .accent { color: var(--coral); }
+
+        .header-sub {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* ─── TIMELINE ───────────────────────────── */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .step-wrapper {
+            display: flex;
+            gap: 24px;
+            position: relative;
+            padding-bottom: 48px;
+        }
+
+        /* Vertical line */
+        .step-wrapper:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 52px;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        /* ─── STEP ICON ──────────────────────────── */
+        .step-icon {
+            flex-shrink: 0;
+            width: 50px; height: 50px;
+            border-radius: 14px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: white;
+            position: relative;
+            z-index: 1;
+            transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+        }
+
+        .step-wrapper:hover .step-icon { transform: rotate(-6deg) scale(1.08); }
+
+        .step-icon svg { width: 22px; height: 22px; stroke: white; stroke-width: 2; }
+
+        /* ─── CARD ───────────────────────────────── */
+        .card {
+            flex: 1;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            box-shadow: var(--shadow);
+            transition: box-shadow .3s, border-color .3s, transform .25s;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .step-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -.3px;
+        }
+
+        .card p {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        /* ─── COMPONENTS ─────────────────────────── */
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            margin: 18px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .checklist li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .check-icon {
+            flex-shrink: 0;
+            width: 20px; height: 20px;
+            border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            margin-top: 2px;
+        }
+
+        .check-icon svg { width: 11px; height: 11px; stroke: white; stroke-width: 3; }
+
+        /* Info Block */
+        .info-block {
+            margin-top: 18px;
+            padding: 16px 18px;
+            border-radius: var(--radius-sm);
+            border-left: 3px solid;
+            background: var(--bg);
+            font-size: 13.5px;
+        }
+
+        /* Bank Grid */
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .bank-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .bank-item span {
+            display: block;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 2px;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 11px 44px;
+            border-radius: 999px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            border: 2px solid;
+            cursor: pointer;
+            transition: all .2s;
+            margin-top: 14px;
+            text-decoration: none;
+            text-align: center;
+            line-height: 1;
+        }
+
+        /* Icon floats absolute-left — text stays perfectly centered */
+        .btn svg {
+            width: 15px; height: 15px;
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            flex-shrink: 0;
+        }
+
+        .btn-solid {
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-outline {
+            background: transparent;
+        }
+
+        .btn:hover { opacity: .85; transform: translateY(-1px); }
+        /* hover must not conflict with icon translateY */
+        .btn:hover svg { transform: translateY(-50%); }
+
+        /* File Card */
+        .file-card {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-top: 16px;
+            transition: border-color .2s;
+        }
+
+        .file-card:hover { border-color: var(--sky); }
+
+        .file-icon {
+            flex-shrink: 0;
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .file-icon svg { width: 18px; height: 18px; stroke: white; }
+
+        .file-info { flex: 1; }
+        .file-name { font-size: 13.5px; font-weight: 600; }
+        .file-sub { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+
+        /* WhatsApp block */
+        .wa-block {
+            background: var(--bg);
+            border: 1.5px dashed var(--border);
+            border-radius: var(--radius-sm);
+            padding: 18px;
+            margin-top: 18px;
+        }
+
+        .wa-label {
+            font-size: 10.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .wa-quote {
+            font-style: italic;
+            font-size: 13.5px;
+            border-left: 3px solid var(--border);
+            padding-left: 14px;
+            line-height: 1.75;
+            color: var(--text);
+        }
+
+        /* Contact card */
+        .contact-card {
+            border-radius: var(--radius-sm);
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 16px;
+            color: white;
+            transition: transform .2s, opacity .2s;
+        }
+
+        a.contact-card:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .contact-card svg { width: 22px; height: 22px; stroke: white; flex-shrink: 0; }
+
+        .contact-name { font-weight: 700; font-size: 15px; }
+        .contact-num { font-size: 13px; opacity: .85; }
+
+        /* Resource grid */
+        .resource-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .res-card {
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            transition: border-color .2s;
+        }
+
+        .res-card:hover { border-color: var(--sky); }
+
+        .res-type { font-size: 10.5px; text-transform: uppercase; font-weight: 700; letter-spacing: .8px; color: var(--muted); }
+        .res-name { font-size: 13px; font-weight: 600; margin: 3px 0 10px; }
+
+        /* Form mockup */
+        .form-mock {
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 18px;
+            margin-top: 18px;
+            font-size: 13px;
+        }
+
+        .form-field {
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .form-field:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
+
+        .form-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+        .form-value { font-weight: 600; margin-top: 2px; }
+        .form-list { margin: 4px 0 0 14px; }
+        .form-list li { font-weight: 600; font-size: 13px; }
+
+        /* Divider doc */
+        .doc-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 20px 0;
+        }
+
+        /* Closing box */
+        .closing-box {
+            border-radius: var(--radius-sm);
+            padding: 24px;
+            margin-top: 18px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .closing-box p { font-size: 15px; font-style: italic; line-height: 1.65; position: relative; z-index: 1; color: white; }
+
+        .closing-box .watermark {
+            position: absolute;
+            right: -20px; bottom: -20px;
+            opacity: .1;
+            transform: rotate(-20deg);
+        }
+
+        /* Step colors map */
+        .s1 { background: var(--coral); }
+        .s2 { background: var(--sky); }
+        .s3 { background: var(--mint); }
+        .s4 { background: var(--yellow); color: #1C1917 !important; }
+        .s5 { background: var(--peach); }
+        .s6 { background: var(--lavender); }
+        .s7 { background: var(--coral); }
+        .s8 { background: var(--sky); }
+        .sf { background: var(--mint); }
+
+        .c1 { color: var(--coral); }
+        .c2 { color: var(--sky); }
+        .c3 { color: var(--mint); }
+        .c4 { color: var(--yellow); }
+        .c5 { color: var(--peach); }
+        .c6 { color: var(--lavender); }
+        .c7 { color: var(--coral); }
+        .c8 { color: var(--sky); }
+        .cf { color: var(--mint); }
+
+        .b1 { border-color: var(--coral); }
+        .b2 { border-color: var(--sky); }
+        .b3 { border-color: var(--mint); }
+        .b4 { border-color: var(--yellow); }
+        .b5 { border-color: var(--peach); }
+        .b6 { border-color: var(--lavender); }
+
+        /* ─── FOOTER ─────────────────────────────── */
+        footer {
+            text-align: center;
+            margin-top: 80px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border);
+            font-size: 12.5px;
+            color: var(--muted);
+        }
+
+        /* ─── RESPONSIVE ─────────────────────────── */
+        @media (max-width: 600px) {
+            .step-wrapper { gap: 14px; }
+            .step-wrapper:not(:last-child)::after { left: 19px; }
+            .step-icon { width: 40px; height: 40px; border-radius: 11px; }
+            .card { padding: 20px 18px; }
+            h1 { letter-spacing: -1px; }
+            .resource-grid { grid-template-columns: 1fr; }
+            .step-icon svg { width: 18px; height: 18px; }
+        }
+
+        /* ─── ANIMATIONS ─────────────────────────── */
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-wrapper {
+            opacity: 0;
+            animation: fadeUp .5s ease forwards;
+        }
+
+        .step-wrapper:nth-child(1) { animation-delay: .05s; }
+        .step-wrapper:nth-child(2) { animation-delay: .10s; }
+        .step-wrapper:nth-child(3) { animation-delay: .15s; }
+        .step-wrapper:nth-child(4) { animation-delay: .20s; }
+        .step-wrapper:nth-child(5) { animation-delay: .25s; }
+        .step-wrapper:nth-child(6) { animation-delay: .30s; }
+        .step-wrapper:nth-child(7) { animation-delay: .35s; }
+        .step-wrapper:nth-child(8) { animation-delay: .40s; }
+        .step-wrapper:nth-child(9) { animation-delay: .45s; }
+
+        header { animation: fadeUp .45s ease forwards; }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Action Button (Settings) -->
+    <div class="fab-wrapper" id="fabWrapper">
+        <!-- Sub-menu -->
+        <div class="fab-menu" id="fabMenu">
+            <button class="theme-btn" id="btnTop" aria-label="Scroll to top" title="Kembali ke atas">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--sky)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+            </button>
+            <button class="theme-btn" id="btnBottom" aria-label="Scroll to bottom" title="Ke paling bawah">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+            </button>
+            <button class="theme-btn" id="btnMusic" aria-label="Toggle music" title="Play/Pause Musik">
+                <!-- Play icon -->
+                <svg id="icon-play" viewBox="0 0 24 24" fill="none" stroke="var(--lavender)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <!-- Pause icon -->
+                <svg id="icon-pause" viewBox="0 0 24 24" fill="none" stroke="var(--lavender)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                    <rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>
+                </svg>
+            </button>
+            <button class="theme-btn" id="themeToggle" aria-label="Toggle dark mode" title="Ganti tema">
+                <!-- Sun icon — shown in light mode -->
+                <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                </svg>
+                <!-- Moon icon — shown in dark mode -->
+                <svg id="icon-moon" viewBox="0 0 24 24" fill="none" stroke="var(--lavender)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Main FAB -->
+        <button class="theme-btn fab-main" id="fabMain" aria-label="Pengaturan" title="Pengaturan">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+    </div>
+
+    <div class="container">
+
+        <!-- HEADER -->
+        <header>
+            <div class="header-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+                Panduan Akademik IPII
+            </div>
+
+            <h1>Sempro <span class="accent">Cepat</span></h1>
+            <p class="header-sub">8 tahap jelas dari proposal sampai Sempro<br>oleh Ahmad Muhaimin</p>
+        </header>
+
+        <!-- TIMELINE -->
+        <div class="timeline">
+
+            <!-- TAHAP 1 -->
+            <div class="step-wrapper">
+                <div class="step-icon s1">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4m6 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c1">Tahap 01 — Persiapan & Cek</div>
+                    <h2>Diterima Dosen Pembimbing</h2>
+                    <p>Setelah proposal selesai dan disetujui pembimbing secara lisan/tulisan, lakukan validasi orisinalitas sebelum lanjut.</p>
+
+                    <div class="info-block b1" style="border-left-color: var(--coral);">
+                        <div style="font-weight: 700; font-size: 13.5px; margin-bottom: 6px;">Jasa Cek Plagiasi (Opsional)</div>
+                        <p style="font-size: 13px; color: var(--muted);">Batas maksimal 25% — Rp4.000 per file. Request pengecualian bisa diatur.</p>
+                        <div class="bank-grid">
+                            <div class="bank-item"><span>BRI</span>000301108296503</div>
+                            <div class="bank-item"><span>BCA</span>7821021891</div>
+                            <div class="bank-item"><span>Dana</span>089518893136</div>
+                        </div>
+                        <a href="https://wa.me/087823677235" class="btn btn-solid s1" style="background: var(--coral);">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-13.5 8.38 8.38 0 0 1 3.8.9L21 3z"/>
+                            </svg>
+                            Hubungi Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAHAP 2 -->
+            <div class="step-wrapper">
+                <div class="step-icon s2">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c2">Tahap 02 — Legalisasi Dokumen</div>
+                    <h2>Surat Persetujuan Naskah</h2>
+                    <p>Siapkan surat persetujuan formal sebagai bukti proposal siap disidangkan.</p>
+
+                    <ul class="checklist" style="margin-top: 16px;">
+                        <li>
+                            <div class="check-icon s2"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Buat surat persetujuan naskah proposal</span>
+                        </li>
+                        <li>
+                            <div class="check-icon s2"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Tanda tangan (basah/kering sesuai ketentuan dosen)</span>
+                        </li>
+                    </ul>
+
+                    <a href="#" class="btn btn-outline b2 c2">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        Download Template Surat
+                    </a>
+                </div>
+            </div>
+
+            <!-- TAHAP 3 -->
+            <div class="step-wrapper">
+                <div class="step-icon s3">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c3">Tahap 03 — Pengajuan Prodi</div>
+                    <h2>Submit Proposal</h2>
+                    <p>Ajukan berkas ke Program Studi melalui tautan resmi yang tersedia.</p>
+
+                    <ul class="checklist" style="margin-top: 16px;">
+                        <li>
+                            <div class="check-icon s3"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>KTM</span>
+                        </li>
+                        <li>
+                            <div class="check-icon s3"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>KHS Semester 1–5</span>
+                        </li>
+                        <li>
+                            <div class="check-icon s3"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Surat Persetujuan Pembimbing</span>
+                        </li>
+                    </ul>
+
+                    <a href="https://docs.google.com/forms/d/..." class="btn btn-solid" style="background: var(--mint);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                        </svg>
+                        Link Google Form Prodi
+                    </a>
+
+                    <p style="margin-top: 16px; font-size: 12.5px; color: var(--muted); font-style: italic;">Sembari menunggu, tetap jaga komunikasi baik dengan dosen pembimbing.</p>
+                </div>
+            </div>
+
+            <!-- TAHAP 4 -->
+            <div class="step-wrapper">
+                <div class="step-icon s4" style="color: #1C1917;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#1C1917" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c4">Tahap 04 — Pengumuman Sidang</div>
+                    <h2>Hasil Rapat Sidang Prodi</h2>
+                    <p>Prodi melakukan rapat pleno untuk menentukan kelayakan judul dan pembimbing kamu.</p>
+
+                    <a href="https://drive.google.com/file/d/1lzAb7PRtfbRkYWImL9icebfv9llqsSJx/view?usp=sharing" target="_blank" class="file-card" style="text-decoration:none;">
+                        <div class="file-icon s4">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#1C1917" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">Hasil Rapat Sidang Skripsi IPII.pdf</div>
+                            <div class="file-sub">Periode Maret 2026 — Contoh keputusan sidang prodi</div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </a>
+
+                    <div class="info-block b4" style="border-left-color: var(--yellow); margin-top: 16px;">
+                        <strong>Diterima dengan Perbaikan?</strong><br>
+                        <span style="font-size: 13px; color: var(--muted);">Segera lakukan revisi sesuai catatan penguji sebelum lanjut ke tahap SK.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAHAP 5 -->
+            <div class="step-wrapper">
+                <div class="step-icon s5">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="12" cy="15" r="3"/></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c5">Tahap 05 — Administrasi Lanjut</div>
+                    <h2>Penerbitan SK Pembimbing</h2>
+                    <p>Tunggu terbitnya SK resmi sebelum lanjut ke proses Seminar Proposal.</p>
+
+                    <a href="https://drive.google.com/file/d/1jk2FI6Xqm3Vumm2HKxsbw0G0QO_Tmqq_/view?usp=sharing" target="_blank" class="file-card" style="text-decoration:none;">
+                        <div class="file-icon s5">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="12" cy="15" r="3"/></svg>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">SK Pembimbing Skripsi Ahmad Muhaimin.pdf</div>
+                            <div class="file-sub">Simpan baik-baik sebagai bukti legalitas bimbingan</div>
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--muted);flex-shrink:0;"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    </a>
+
+                    <ul class="checklist" style="margin-top: 16px;">
+                        <li>
+                            <div class="check-icon s5"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Pastikan NIP pembimbing sesuai</span>
+                        </li>
+                        <li>
+                            <div class="check-icon s5"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Lanjut ke proses administrasi Seminar Proposal</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- TAHAP 6 -->
+            <div class="step-wrapper">
+                <div class="step-icon s6">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c6">Tahap 06 — Administrasi & Logistik</div>
+                    <h2>Persiapan Pelaksanaan Sempro</h2>
+                    <p>Setelah SK terbit, atur jadwal dan siapkan surat undangan serta peminjaman tempat.</p>
+
+                    <div style="margin-top: 18px;">
+                        <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Kelengkapan Personil</div>
+                        <ul class="checklist">
+                            <li><div class="check-icon s6"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>1 Moderator</span></li>
+                            <li><div class="check-icon s6"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>1 Penanggap Utama (dari Prodi)</span></li>
+                            <li><div class="check-icon s6"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>3 Penanggap Umum</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="form-mock">
+                        <div style="font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px;">Panduan Pengisian Form Permohonan</div>
+                        <div class="form-field">
+                            <div class="form-label">Unit Kerja</div>
+                            <div class="form-value">Fakultas Tarbiyah dan Keguruan</div>
+                        </div>
+                        <div class="form-field">
+                            <div class="form-label">Program Studi</div>
+                            <div class="form-value">S1 Ilmu Perpustakaan dan Informasi Islam</div>
+                        </div>
+                        <div class="form-field">
+                            <div class="form-label">Jenis Permohonan (pilih 2 — buat 2 surat terpisah)</div>
+                            <ol class="form-list">
+                                <li>Undangan Sempro SKRIPSI (untuk 1 Pembimbing)</li>
+                                <li>Permohonan Peminjaman Lokal Munaqosyah</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                  <a href="https://salam.uin-antasari.ac.id/" target="_blank" class="btn btn-outline b6 c6" style="display:flex; width:100%; margin-top:14px;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                  </svg>
+                  Buka Portal SALAM UIN Antasari
+              </a>
+
+                    <a href="https://wa.me/6282175526698" target="_blank" class="contact-card s6">
+                        <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                        <div>
+                            <div style="font-size: 10.5px; opacity: .75; text-transform: uppercase; letter-spacing: .5px;">Konfirmasi Pasca Pengisian</div>
+                            <div class="contact-name">Bapak Alfin</div>
+                            <div class="contact-num">+62 821-7552-6698</div>
+                        </div>
+                    </a>
+                    <p style="font-size: 11.5px; color: var(--muted); font-style: italic; margin-top: 8px;">Segera hubungi beliau agar permohonan surat cepat diproses.</p>
+                </div>
+            </div>
+
+            <!-- TAHAP 7 -->
+            <div class="step-wrapper">
+                <div class="step-icon s7">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c7">Tahap 07 — Distribusi & Konfirmasi</div>
+                    <h2>Penyampaian Undangan &amp; Izin Lokal</h2>
+                    <p>Setelah surat fisik/digital dari prodi, lakukan langkah distribusi berikut.</p>
+
+                    <ul class="checklist" style="margin-top: 18px;">
+                        <li>
+                            <div class="check-icon s7"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <div>
+                                <div style="font-weight: 600;">Kirim undangan ke dosen pembimbing</div>
+                                <div style="font-size: 12.5px; color: var(--muted);">Pastikan dosen mengonfirmasi kehadiran.</div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="check-icon s7"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <div>
+                                <div style="font-weight: 600;">Serahkan surat peminjaman tempat</div>
+                                <div style="font-size: 12.5px; color: var(--muted);">Ke bagian Mikwa, Lantai 1 FTK Banjarbaru — <strong>Bapak Khairul Puadi.</strong></div>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <div class="wa-block">
+                        <div class="wa-label">Contoh pesan ke Mikwa</div>
+                        <div class="wa-quote">
+                            "Assalamualaikum warahmatullahi wabarakatuh, mohon maaf mengganggu waktunya bapak, ulun <strong>[Nama Anda]</strong> mahasiswa semester <strong>[...]</strong> dari jurusan Ilmu Perpustakaan dan Informasi Islam.<br><br>
+                            Izin bertanya bapak, apakah bapak ada di ruangan Mikwa FTK Kampus 2? Ulun izin ingin menyerahkan surat peminjaman tempat untuk kegiatan seminar proposal skripsi pak.<br><br>
+                            Atas waktu dan perhatiannya terima kasih banyak bapak."
+                        </div>
+                        <a href="https://wa.me/6282251362084" class="btn btn-solid s7" style="background: var(--coral); width: 100%; justify-content: center;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-13.5 8.38 8.38 0 0 1 3.8.9L21 3z"/>
+                            </svg>
+                            Chat Bapak Khairul Puadi
+                        </a>
+                    </div>
+                    <p style="font-size: 11.5px; color: var(--muted); margin-top: 10px; text-align: center;">Pastikan berkomunikasi sopan pada jam kerja.</p>
+                </div>
+            </div>
+
+            <!-- TAHAP 8 -->
+            <div class="step-wrapper">
+                <div class="step-icon s8">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c8">Tahap 08 — Final Check</div>
+                    <h2>Persiapan Berkas Hari H</h2>
+                    <p>Daftar dokumen wajib yang perlu diedit, diprint, dan disiapkan sebelum seminar.</p>
+
+                    <ul class="checklist" style="margin: 18px 0; background: var(--bg); padding: 18px; border-radius: var(--radius-sm); border: 1.5px dashed var(--border);">
+                        <li><div class="check-icon s8"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>Proposal Skripsi (2 Jilid)</span></li>
+                        <li><div class="check-icon s8"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>Berita Acara</span></li>
+                        <li><div class="check-icon s8"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>Catatan Seminar Proposal Skripsi</span></li>
+                        <li><div class="check-icon s8"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>Naskah Moderator (opsional)</span></li>
+                        <li><div class="check-icon s8"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div><span>PPT Penyaji</span></li>
+                    </ul>
+
+                    <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 10px;">Resources &amp; Template</div>
+                    <div class="resource-grid">
+                        <div class="res-card">
+                            <div class="res-type">Administrasi</div>
+                            <div class="res-name">Berita Acara &amp; Catatan</div>
+                            <a href="https://docs.google.com/document/d/1EqESVsYmlFwFhkZcuMKl6k83jaJXer7n/edit?usp=sharing&ouid=114999742077922047446&rtpof=true&sd=true" target="_blank" class="btn btn-outline b2 c2" style="padding: 6px 14px; font-size: 12px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Download.docx
+                            </a>
+                        </div>
+                        <div class="res-card">
+                            <div class="res-type">Opsional</div>
+                            <div class="res-name">Naskah Moderator</div>
+                            <a href="https://docs.google.com/document/d/14t6RT8dvvhst7ZEz5SnZ4-sPzpEv-8-B/edit?usp=sharing&ouid=114999742077922047446&rtpof=true&sd=true" target="_blank" class="btn btn-outline b2 c2" style="padding: 6px 14px; font-size: 12px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Download.docx
+                            </a>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 18px;">
+                        <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 10px;">Contoh Slide Presentasi</div>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <a href="https://drive.google.com/file/d/1D6VU263cUfAKjmyJ5W0KQ3s8KlDCbDxW/view?usp=sharing" target="_blank" class="btn btn-outline b2 c2" style="padding: 8px 16px; font-size: 12.5px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                Contoh Kuantitatif
+                            </a>
+                            <a href="https://drive.google.com/file/d/1GQXtM-UTBKoyQSHBO4lTyddKLJe8WrcU/view?usp=sharing" target="_blank" class="btn btn-outline b2 c2" style="padding: 8px 16px; font-size: 12.5px;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                                Contoh Kualitatif
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FINAL -->
+            <div class="step-wrapper">
+                <div class="step-icon sf">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <div class="card" style="border-top: 3px solid var(--mint);">
+                    <div class="step-label cf">Final Step — Pasca Seminar</div>
+                    <h2>Langkah Selanjutnya</h2>
+
+                    <div class="closing-box sf">
+                        <p>"Selesai Sempro, lakukan revisi jika ada masukan dari penguji, dan segera selesaikan skripsi kamu untuk melangkah ke <strong>Sidang Munaqasyah.</strong>"</p>
+                        <div class="watermark">
+                            <svg width="100" height="100" viewBox="0 0 24 24" fill="white"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                    </div>
+
+                    <div class="file-card" style="margin-top: 16px;">
+                        <div class="file-icon sf">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 14 12 17 15 14"/></svg>
+                        </div>
+                        <div>
+                            <div class="file-name">Tips Pengarsipan Digital</div>
+                            <div class="file-sub">Rapikan semua berkas Sempro ke Google Drive — akan sangat membantu saat daftar Sidang Munaqasyah nanti.</div>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 36px; padding-top: 24px; border-top: 1px solid var(--border);">
+                        <p style="font-style: italic; font-size: 12px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase;">Sempro is a journey, not a destination.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- .timeline -->
+
+        <footer>
+            <p style="font-weight: 600;">&copy; 2026 Ahmad Muhaimin — Sempro Cepat</p>
+            <p style="margin-top: 4px;">Dibuat untuk memudahkan langkah akademik sesama mahasiswa IPII.</p>
+        </footer>
+
+    </div><!-- .container -->
+
+    <script>
+        const btn = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        const sun = document.getElementById('icon-sun');
+        const moon = document.getElementById('icon-moon');
+
+        // Load saved preference
+        const saved = localStorage.getItem('theme');
+        if (saved === 'dark') {
+            html.setAttribute('data-theme', 'dark');
+            sun.style.display = 'none';
+            moon.style.display = 'block';
+        }
+
+        btn.addEventListener('click', () => {
+            const isDark = html.getAttribute('data-theme') === 'dark';
+            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+            sun.style.display = isDark ? 'block' : 'none';
+            moon.style.display = isDark ? 'none' : 'block';
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        });
+
+    // --- FAB MENU & IDLE TIMER ---
+    const fabWrapper = document.getElementById('fabWrapper');
+    const fabMain = document.getElementById('fabMain');
+    const fabMenu = document.getElementById('fabMenu');
+    const btnTop = document.getElementById('btnTop');
+    const btnBottom = document.getElementById('btnBottom');
+    let idleTimer;
+
+    function closeFabMenu() {
+        fabMenu.classList.remove('active');
+        fabMain.classList.remove('active');
+    }
+
+    // Mengubah status buka/tutup menu
+    fabMain.addEventListener('click', () => {
+        fabMenu.classList.toggle('active');
+        fabMain.classList.toggle('active');
+        resetIdleTimer();
+    });
+
+    // Tindakan klik pada tombol dalam menu
+    btnTop.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); closeFabMenu(); resetIdleTimer(); });
+    btnBottom.addEventListener('click', () => { window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' }); closeFabMenu(); resetIdleTimer(); });
+    btn.addEventListener('click', closeFabMenu); // Tutup menu jika tombol dark mode diklik
+
+    // Tutup menu jika klik di luar area FAB
+    document.addEventListener('click', (e) => {
+        if (!fabWrapper.contains(e.target) && fabMenu.classList.contains('active')) {
+            closeFabMenu();
+            resetIdleTimer();
+        }
+    });
+
+    // Logika Timer Idle (Sembunyikan setelah 5 detik)
+    function resetIdleTimer() {
+        fabWrapper.classList.remove('hidden');
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => {
+            if (!fabMenu.classList.contains('active')) { // Jangan sembunyikan jika menu sedang terbuka
+                fabWrapper.classList.add('hidden');
+            }
+        }, 5000);
+    }
+
+    window.addEventListener('scroll', resetIdleTimer);
+    window.addEventListener('mousemove', resetIdleTimer);
+    window.addEventListener('touchstart', resetIdleTimer);
+    resetIdleTimer(); // Inisiasi pertama saat web dimuat
+
+    // --- BACKGROUND MUSIC ---
+    const bgMusic = new Audio('Medieval-Music-Cobblestone-Village.mp3');
+    bgMusic.loop = true; // Diputar secara berulang
+    bgMusic.volume = 0.4; // Volume disesuaikan agar tidak terlalu bising
+
+    const btnMusic = document.getElementById('btnMusic');
+    const iconPlay = document.getElementById('icon-play');
+    const iconPause = document.getElementById('icon-pause');
+    let isMusicPlaying = false;
+
+    function toggleMusic() {
+        if (isMusicPlaying) {
+            bgMusic.pause();
+            isMusicPlaying = false;
+            iconPlay.style.display = 'block';
+            iconPause.style.display = 'none';
+        } else {
+            bgMusic.play().then(() => {
+                isMusicPlaying = true;
+                iconPlay.style.display = 'none';
+                iconPause.style.display = 'block';
+            }).catch(() => { /* Abaikan error di console jika browser memblokir */ });
+        }
+    }
+
+    btnMusic.addEventListener('click', () => { toggleMusic(); resetIdleTimer(); });
+
+    // Auto-play membutuhkan interaksi pertama dari user (kebijakan browser)
+    const startMusicOnInteract = () => {
+        if (!isMusicPlaying) toggleMusic();
+        document.removeEventListener('click', startMusicOnInteract); // Hapus detektor setelah musik jalan
+    };
+    document.addEventListener('click', startMusicOnInteract);
+
+    // Coba putar otomatis saat halaman selesai dimuat
+    window.addEventListener('DOMContentLoaded', () => {
+        if (!isMusicPlaying) toggleMusic();
+    });
+
+        // --- SOUND EFFECT ---
+        const uiSound = new Audio('click-sound.mp3');
+        uiSound.volume = 0.4; // Menyesuaikan volume agar tidak terlalu bising (opsional)
+
+        function playUiSound() {
+            uiSound.currentTime = 0; // Reset agar suara bisa diputar berulang dengan cepat
+            uiSound.play().catch(() => {}); // Catch digunakan untuk mencegah error di console jika browser memblokir auto-play sebelum ada interaksi klik dari user
+        }
+
+        const interactables = document.querySelectorAll('.card, .btn, .file-card, .res-card, .contact-card, .theme-btn');
+        interactables.forEach(el => {
+            el.addEventListener('mouseenter', playUiSound);
+            el.addEventListener('click', playUiSound);
+        });
+    </script>
+</body>
+</html>
