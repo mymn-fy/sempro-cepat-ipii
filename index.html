@@ -145,16 +145,75 @@
             justify-content: center;
             box-shadow: 0 4px 20px rgba(0,0,0,.15);
             transition: transform .3s cubic-bezier(.34,1.56,.64,1), background .3s, border-color .3s, box-shadow .3s;
+            position: relative;
         }
 
         .theme-btn:hover {
-            transform: scale(1.12) rotate(15deg);
+            transform: scale(1.12);
             box-shadow: 0 6px 28px rgba(0,0,0,.2);
         }
 
         .theme-btn svg {
             width: 20px; height: 20px;
         transition: transform .3s, opacity .2s;
+    }
+
+    .theme-btn:hover svg {
+        transform: rotate(15deg);
+    }
+
+    /* Tooltip Custom FAB */
+    @media (hover: hover) and (pointer: fine) {
+        .theme-btn::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            right: calc(100% + 14px);
+            top: 50%;
+            transform: translateY(-50%) scale(0.9);
+            background: var(--tt-color, var(--text));
+            color: #1C1917;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+            box-shadow: var(--shadow-hover);
+            z-index: 1000;
+        }
+
+        .theme-btn::after {
+            content: '';
+            position: absolute;
+            right: calc(100% + 8px);
+            top: 50%;
+            transform: translateY(-50%) scale(0.9);
+            border-width: 5px 0 5px 6px;
+            border-style: solid;
+            border-color: transparent transparent transparent var(--tt-color, var(--text));
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+            z-index: 1000;
+        }
+
+        .theme-btn:hover::before,
+        .theme-btn:hover::after {
+            opacity: 1;
+            visibility: visible;
+            /* Skala 0.89 untuk menetralkan efek scale(1.12) dari tombol */
+            transform: translateY(-50%) scale(0.89); 
+        }
+
+        /* Sembunyikan tooltip pada tombol utama saat menu sedang terbuka */
+        .fab-main.active::before,
+        .fab-main.active::after {
+            display: none;
+        }
     }
 
     .fab-main {
@@ -694,16 +753,16 @@
     <div class="fab-wrapper" id="fabWrapper">
         <!-- Sub-menu -->
         <div class="fab-menu" id="fabMenu">
-            <button class="theme-btn" id="btnTop" aria-label="Scroll to top" title="Kembali ke atas">
+                <button class="theme-btn" id="btnTop" aria-label="Scroll to top" data-tooltip="Kembali ke atas" style="--tt-color: var(--sky);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="var(--sky)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
             </button>
-            <button class="theme-btn" id="btnBottom" aria-label="Scroll to bottom" title="Ke paling bawah">
+                <button class="theme-btn" id="btnBottom" aria-label="Scroll to bottom" data-tooltip="Ke paling bawah" style="--tt-color: var(--mint);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
             </button>
-            <button class="theme-btn" id="btnCheckAll" aria-label="Check/Uncheck All" title="Centang/Hapus Semua Tugas">
+                <button class="theme-btn" id="btnCheckAll" aria-label="Check/Uncheck All" data-tooltip="Centang/Hapus Semua Tugas" style="--tt-color: var(--yellow);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             </button>
-            <button class="theme-btn" id="btnMusic" aria-label="Toggle music" title="Play/Pause Musik">
+                <button class="theme-btn" id="btnMusic" aria-label="Toggle music" data-tooltip="Play/Pause Musik" style="--tt-color: var(--lavender);">
                 <!-- Play icon -->
                 <svg id="icon-play" viewBox="0 0 24 24" fill="none" stroke="var(--lavender)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
@@ -713,13 +772,13 @@
                     <rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect>
                 </svg>
             </button>
-            <button class="theme-btn" id="btnShare" aria-label="Bagikan" title="Bagikan ke Teman">
+                <button class="theme-btn" id="btnShare" aria-label="Bagikan" data-tooltip="Bagikan ke Teman" style="--tt-color: var(--peach);">
                 <svg viewBox="0 0 24 24" fill="none" stroke="var(--peach)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle>
                     <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
                 </svg>
             </button>
-            <button class="theme-btn" id="themeToggle" aria-label="Toggle dark mode" title="Ganti tema">
+                <button class="theme-btn" id="themeToggle" aria-label="Toggle dark mode" data-tooltip="Ganti tema" style="--tt-color: var(--coral);">
                 <!-- Sun icon — shown in light mode -->
                 <svg id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="5"/>
@@ -736,7 +795,7 @@
         </div>
         
         <!-- Main FAB -->
-        <button class="theme-btn fab-main" id="fabMain" aria-label="Pengaturan" title="Pengaturan">
+        <button class="theme-btn fab-main" id="fabMain" aria-label="Pengaturan" data-tooltip="Pengaturan" style="--tt-color: var(--fab-icon);">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
         </button>
     </div>
