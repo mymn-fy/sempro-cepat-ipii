@@ -601,6 +601,7 @@
         }
 
         /* Step colors map */
+        .s0 { background: var(--lavender); }
         .s1 { background: var(--coral); }
         .s2 { background: var(--sky); }
         .s3 { background: var(--mint); }
@@ -611,6 +612,7 @@
         .s8 { background: var(--sky); }
         .sf { background: var(--mint); }
 
+        .c0 { color: var(--lavender); }
         .c1 { color: var(--coral); }
         .c2 { color: var(--sky); }
         .c3 { color: var(--mint); }
@@ -627,6 +629,7 @@
         .b4 { border-color: var(--yellow); }
         .b5 { border-color: var(--peach); }
         .b6 { border-color: var(--lavender); }
+        .b0 { border-color: var(--lavender); }
 
         /* ─── FOOTER ─────────────────────────────── */
         footer {
@@ -669,6 +672,7 @@
         .step-wrapper:nth-child(7) { animation-delay: .35s; }
         .step-wrapper:nth-child(8) { animation-delay: .40s; }
         .step-wrapper:nth-child(9) { animation-delay: .45s; }
+        .step-wrapper:nth-child(10) { animation-delay: .50s; }
 
         header { animation: fadeUp .45s ease forwards; }
     </style>
@@ -695,6 +699,9 @@
             </button>
             <button class="theme-btn" id="btnBottom" aria-label="Scroll to bottom" title="Ke paling bawah">
                 <svg viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+            </button>
+            <button class="theme-btn" id="btnCheckAll" aria-label="Check/Uncheck All" title="Centang/Hapus Semua Tugas">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--yellow)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             </button>
             <button class="theme-btn" id="btnMusic" aria-label="Toggle music" title="Play/Pause Musik">
                 <!-- Play icon -->
@@ -746,11 +753,39 @@
             </div>
 
             <h1>Sempro <span class="accent">Cepat</span></h1>
-            <p class="header-sub">8 tahap jelas dari proposal sampai Sempro<br>oleh Ahmad Muhaimin</p>
+            <p class="header-sub">10 tahap jelas dari proposal sampai Sempro<br>oleh Ahmad Muhaimin</p>
         </header>
 
         <!-- TIMELINE -->
         <div class="timeline">
+
+            <!-- TAHAP 00 -->
+            <div class="step-wrapper">
+                <div class="step-icon s0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"></path><path d="M9 21h6"></path></svg>
+                </div>
+                <div class="card">
+                    <div class="step-label c0">Tahap 00 — Early Start</div>
+                    <h2>Manfaatkan Mata Kuliah Metopen</h2>
+                    <p>Persiapkan proposalmu dengan sepenuh hati sejak semester lima. Jadikan tugas akhir mata kuliah Metodologi Penelitian (Metopen) sebagai fondasi kokoh untuk proposal skripsimu.</p>
+                    
+                    <ul class="checklist" style="margin-top: 16px;">
+                        <li>
+                            <div class="check-icon s0"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Eksplorasi topik penelitian yang benar-benar kamu minati</span>
+                        </li>
+                        <li>
+                            <div class="check-icon s0"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Kerjakan draf proposal Metopen sebaik dan serapi mungkin</span>
+                        </li>
+                    </ul>
+
+                    <div class="info-block b0" style="border-left-color: var(--lavender);">
+                        <strong>Keunggulan Memulai Awal:</strong><br>
+                        <span style="font-size: 13px; color: var(--muted);">Saat semester enam tiba, kamu sudah punya bahan solid untuk diajukan ke dosen pembimbing. Ini akan sangat mempercepat proses persetujuan dan memberimu keunggulan waktu.</span>
+                    </div>
+                </div>
+            </div>
 
             <!-- TAHAP 1 -->
             <div class="step-wrapper">
@@ -759,24 +794,19 @@
                 </div>
                 <div class="card">
                     <div class="step-label c1">Tahap 01 — Persiapan & Cek</div>
-                    <h2>Diterima Dosen Pembimbing</h2>
-                    <p>Setelah proposal selesai dan disetujui pembimbing secara lisan/tulisan, lakukan validasi orisinalitas sebelum lanjut.</p>
+                    <h2>Acc Pembimbing & Cek Plagiasi</h2>
+                    <p>Ajukan naskah proposalmu ke dosen pembimbing. Setelah disetujui, pastikan orisinalitasnya terjaga (maksimal 25% tingkat plagiasi) sebelum mencetak dokumen resmi.</p>
 
-                    <div class="info-block b1" style="border-left-color: var(--coral);">
-                        <div style="font-weight: 700; font-size: 13.5px; margin-bottom: 6px;">Jasa Cek Plagiasi (Opsional)</div>
-                        <p style="font-size: 13px; color: var(--muted);">Batas maksimal 25% — Rp4.000 per file. Request pengecualian bisa diatur.</p>
-                        <div class="bank-grid">
-                            <div class="bank-item"><span>BRI</span>000301108296503</div>
-                            <div class="bank-item"><span>BCA</span>7821021891</div>
-                            <div class="bank-item"><span>Dana</span>089518893136</div>
-                        </div>
-                        <a href="https://wa.me/6287823677235" class="btn btn-solid s1" style="background: var(--coral);">
-                            <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-13.5 8.38 8.38 0 0 1 3.8.9L21 3z"/>
-                            </svg>
-                            Hubungi Admin
-                        </a>
-                    </div>
+                    <ul class="checklist" style="margin-top: 16px;">
+                        <li>
+                            <div class="check-icon s1"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Bimbingan & revisi draf dengan dosen pembimbing</span>
+                        </li>
+                        <li>
+                            <div class="check-icon s1"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+                            <span>Lakukan cek plagiasi mandiri (batas maks. 25%)</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
@@ -1335,6 +1365,43 @@
         });
         updateTaskProgress(); // Inisialisasi awal UI
         showPillTemporarily(); // Panggil saat web pertama kali dimuat
+
+        // --- FITUR: CHECK/UNCHECK ALL ---
+        const btnCheckAll = document.getElementById('btnCheckAll');
+        if (btnCheckAll) {
+            btnCheckAll.addEventListener('click', () => {
+                playUiSound();
+                showPillTemporarily();
+                
+                const total = checkItems.length;
+                const checkedCount = document.querySelectorAll('.checklist li.is-checked').length;
+                const isAllChecked = checkedCount === total;
+                
+                savedChecks = []; // Reset array
+                
+                checkItems.forEach((li, index) => {
+                    const iconDiv = li.querySelector('.check-icon');
+                    if (isAllChecked) {
+                        // Jika semua sudah dicentang, maka hapus semua centang (uncheck all)
+                        li.classList.remove('is-checked');
+                        iconDiv.classList.add('unchecked');
+                    } else {
+                        // Jika belum semua, maka centang semuanya (check all)
+                        li.classList.add('is-checked');
+                        iconDiv.classList.remove('unchecked');
+                        savedChecks.push(index);
+                    }
+                });
+                
+                localStorage.setItem('sempro-checks', JSON.stringify(savedChecks));
+                const progress = updateTaskProgress();
+                
+                if (!isAllChecked) fireConfetti();
+                
+                closeFabMenu();
+                resetIdleTimer();
+            });
+        }
 
         // --- FITUR 5: SHARE BUTTON ---
         const btnShare = document.getElementById('btnShare');
