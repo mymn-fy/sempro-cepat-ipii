@@ -735,6 +735,23 @@
         .step-wrapper:nth-child(10) { animation-delay: .50s; }
 
         header { animation: fadeUp .45s ease forwards; }
+        
+        /* Radial reveal (tema) — soft glow, tidak menutupi konten */
+        .theme-reveal {
+            position: fixed;
+            pointer-events: none;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0.08);
+            transition: transform 520ms cubic-bezier(.22,.9,.32,1), opacity 320ms ease;
+            z-index: 9999;
+            opacity: 1;
+            width: 20px;
+            height: 20px;
+            will-change: transform, opacity;
+            filter: blur(30px);
+            mix-blend-mode: normal;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
+        }
     </style>
 </head>
 <body>
@@ -898,7 +915,7 @@
                         </li>
                         <li>
                             <div class="check-icon s2"><svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
-                            <span>Tanda tangan (basah/kering sesuai ketentuan dosen)</span>
+                            <span>Tanda tangan (basah/kering sesuai kesepakatan dengan dosen pembimbing)</span>
                         </li>
                     </ul>
 
@@ -1274,12 +1291,73 @@
             moon.style.display = 'block';
         }
 
-        btn.addEventListener('click', () => {
+        // Radial reveal theme toggle
+        const themeColors = { light: '#FFFBF5', dark: '#141218' };
+
+        function createThemeReveal(x, y, color) {
+            const el = document.createElement('div');
+            el.className = 'theme-reveal';
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+
+            // subtle tinted radial gradient using the theme color
+            const rgba = (hex, a) => {
+                const c = hex.replace('#','');
+                const r = parseInt(c.substring(0,2),16);
+                const g = parseInt(c.substring(2,4),16);
+                const b = parseInt(c.substring(4,6),16);
+                return `rgba(${r},${g},${b},${a})`;
+            };
+
+            el.style.background = `radial-gradient(circle at center, ${rgba(color,0.14)} 0%, ${rgba(color,0.06)} 25%, rgba(0,0,0,0) 60%)`;
+
+            document.body.appendChild(el);
+
+            // compute a modest size so it feels like a glow, not a full cover
+            const size = Math.max(window.innerWidth, window.innerHeight) * 0.9;
+            el.style.width = size + 'px';
+            el.style.height = size + 'px';
+
+            // start very small and scale up just enough to create tint
+            requestAnimationFrame(() => {
+                el.style.transform = 'translate(-50%, -50%) scale(1)';
+                el.style.opacity = '1';
+            });
+
+            // fade out to reveal content clearly
+            setTimeout(() => {
+                el.style.opacity = '0';
+                el.style.transform = 'translate(-50%, -50%) scale(1.05)';
+            }, 420);
+
+            // remove after finished
+            setTimeout(() => { if (el && el.parentNode) el.parentNode.removeChild(el); }, 960);
+        }
+
+        btn.addEventListener('click', (ev) => {
+            playUiSound();
             const isDark = html.getAttribute('data-theme') === 'dark';
-            html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-            sun.style.display = isDark ? 'block' : 'none';
-            moon.style.display = isDark ? 'none' : 'block';
-            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+            const newTheme = isDark ? 'light' : 'dark';
+
+            // coordinates: center of the button
+            const rect = btn.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+
+            // create reveal with target background color
+            const revealColor = themeColors[newTheme] || getComputedStyle(document.documentElement).getPropertyValue('--bg');
+            createThemeReveal(cx, cy, revealColor);
+
+            // switch theme shortly after animation starts so content will repaint under the reveal
+            setTimeout(() => {
+                html.setAttribute('data-theme', newTheme);
+                sun.style.display = newTheme === 'light' ? 'block' : 'none';
+                moon.style.display = newTheme === 'dark' ? 'block' : 'none';
+                localStorage.setItem('theme', newTheme);
+            }, 120);
+
+            // keep FAB menu closed
+            closeFabMenu();
         });
 
     // --- FAB MENU & IDLE TIMER ---
